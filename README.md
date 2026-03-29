@@ -1,39 +1,51 @@
-# MongoDB Sharded Cluster Deployment Running In Docker Containers
-
-**ATTENTION**
-**Custom version with a smaller number of replicas**
-
-
-Provides the ability to execute a single command to build and run a MongoDB Sharded Cluster on a local workstation with each MongoDB component (`mongod`, `mongos`) running in a separate Docker container. Uses a [Docker](https://docs.docker.com/) [Compose](https://docs.docker.com/compose/overview/) project to launch the [sharded MongoDB cluster](https://docs.mongodb.com/manual/sharding/) containerised deployment consisting of 11 separate containers for:
-
-  * 6 `mongod` processes for the 2 shard replica sets
-  * 3 `mongod` processes for the _configdb_ replica set
-  * 2 `mongos` router processes
-  
-All the containers are visible to each other on the same internal network. Once running, the MongoDB cluster is accessible directly from your workstation via the localhost forwarded ports 27107 & 27108 , which connect to each of the two mongos processes, respectively.
-
-The first time you execute the command to build and run the containers, it takes a few minutes to download all the base Docker images. The containers will normally come up in less than 5 seconds when the command is executed the second and subsequent times.
+<h1 align="center">
+  <br>
+  <img src="https://github.com/home-anthill/docs/blob/master/icons/logo512.png?raw=true" alt="ks89/home-anthill" width="220">
+  <br>
+home-anthill
+  <br>
+sharded-mongodb-docker
+</h1>
 
 
-## Prerequisites
+## :open_book: Documentation :open_book:
 
-* Your workstation is running a recent version of Linux, Windows or Mac OS X
-* [Docker](https://docs.docker.com/install/) is already installed on your workstation
-* [Docker Compose](https://docs.docker.com/compose/install/) is already installed on your workstation
-* The [MongoDB Shell](https://docs.mongodb.com/mongodb-shell/install/) is already installed on your workstation for to you to issue commands to the running database cluster from your workstation (alternatively use the [MongoDB Compass](https://docs.mongodb.com/compass/current/install/) graphical tool to connect to the cluster)
+Take a look here [home-anthill/docs](https://github.com/home-anthill/docs).
 
+**Custom version with a smaller number of replicas** of [THIS PROJECT](https://github.com/pkdone/sharded-mongodb-docker).
 
-## Build, Run & Connect
+Compose project to build and run a MongoDB Sharded Cluster on a local workstation with each MongoDB component (`mongod`, `mongos`) running in a separate container.
 
-1. Launch a command line terminal in the base of folder of this project and execute the following command to build and start all the containers in the Docker Compose project:
+The cluster consists of 6 containers:
+- **Shard0**: 2-member replica set (`shard0-replica0`, `shard0-replica1`)
+- **ConfigDB**: 2-member replica set (`configdb-replica0`, `configdb-replica1`)
+- **Mongos routers**: 2 query routers (`mongos-router0` on host port 27017, `mongos-router1` on host port 27018)
 
+All containers are visible to each other on the same internal network. Once running, the MongoDB cluster is accessible from your workstation via localhost ports 27017 & 27018, which connect to each of the two mongos processes, respectively.
+
+### Prerequisites
+
+* [Podman Desktop](https://podman-desktop.io/) and [podman-compose](https://github.com/containers/podman-compose) are installed on your workstation (suggested)
+* Alternatively, [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) can be used
+* The [MongoDB Shell](https://docs.mongodb.com/mongodb-shell/install/) is already installed on your workstation (alternatively use [MongoDB Compass](https://docs.mongodb.com/compass/current/install/))
+
+### Build, Run & Connect
+
+1. Build and start all containers:
+
+```bash
+podman-compose up --build -d
 ```
+
+Or with Docker Compose:
+
+```bash
 docker compose up --build -d
 ```
 
-2. Connect to the running MongoDB cluster from the MongoDB Shell (the shell will attempt to connect to the first of the two `mongos` endpoints) and then issue the command to print the states of the sharded cluster:
+2. Connect to the running cluster and check its status:
 
-```
+```bash
 mongosh --port 27017
 ```
 
@@ -41,45 +53,53 @@ mongosh --port 27017
 sh.status()
 ```
 
-_Note_: Use port 27018 instead, above, if you want to connect to the second `mongos` endpoint.
+Use port 27018 to connect to the second `mongos` endpoint.
+
+### Tips
+
+* Show running containers: `podman-compose ps` (or `docker compose ps`)
+* Show logs: `podman-compose logs mongos-router0` (or `docker compose logs mongos-router0`)
+* Stop and remove all containers: `podman-compose down` (or `docker compose down`)
 
 
-## Tips
+## :fire: Releases :fire:
 
-* To show all the running docker containers for this Docker Compose project, run:
+GitHub releases [HERE](https://github.com/home-anthill/sharded-mongodb-docker/releases)
 
-```
-docker compose ps
-```
+Versions:
 
-* To show the container logs for one of the `mongos` routers, run:
+- 29/03/2026 - 1.0.0
 
-```
-docker compose logs mongos-router0
-```
 
-* To execute a terminal session directly in one of the `mongos` containers, to then invoke the MongoDB Shell directly accessing the local `mongos` process, run:
+## :sparkling_heart: A big thank you to :sparkling_heart:
 
-```
-docker compose exec mongos-router0 /bin/bash
-```
+##### the authors of the main icon of this project:
 
-```
-mongosh
-```
+- <a href="https://www.freepik.com/free-vector/underground-ant-nest-with-red-ants_18582279.htm">Image by brgfx</a> from <a href="https://www.freepik.com/" title="Freepik">Freepik</a>
 
-* To execute a terminal session directly in one of the `mongod` containers and then view the `mongod` process logs, run:
 
-```
-docker compose exec shard0-replica0 /bin/bash
-```
+# :copyright: License :copyright:
 
-```
-cat /data/db/mongod.log
-```
+The MIT License (MIT)
 
-* To shutdown and remove all the Docker Compose project's running containers (ready for you to rebuild and run again), run:
+Copyright (c) 2021-2026 Stefano Cappa (Ks89)
 
-```
-docker compose down
-```
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+<br/>

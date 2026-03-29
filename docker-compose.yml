@@ -1,4 +1,3 @@
-version: '3.9'
 services:
 
   ######## MONGODB SHARD0 ########
@@ -87,12 +86,17 @@ services:
     expose:
       - "27017"
     ports:
-      - "27017:27017"  # Map the host workstation's port 27017 to the docker instance exposed port 27017 for 'direct' mongos access
+      - "127.0.0.1:27017:27017"  # Map the host workstation's port 27017 to the docker instance exposed port 27017 for 'direct' mongos access
 
   mongos-router1:
     build:
       context: mongos
     command: mongos --port 27017 --bind_ip 0.0.0.0 --configdb "configdb/configdb-replica0:27017,configdb-replica1:27017"
+    depends_on:
+      - shard0-replica0
+      - shard0-replica1
+      - configdb-replica0
+      - configdb-replica1
     networks:
       internalnetwork:
         aliases:
@@ -100,7 +104,7 @@ services:
     expose:
       - "27017"
     ports:
-      - "27018:27017"  # Map the host workstation's port 27018 to the docker instance exposed port 27017 for 'direct' mongos access
+      - "127.0.0.1:27018:27017"  # Map the host workstation's port 27018 to the docker instance exposed port 27017 for 'direct' mongos access
 
 networks:
   internalnetwork: {}
