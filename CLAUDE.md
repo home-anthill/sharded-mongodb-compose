@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Docker Compose project (part of the [home-anthill](https://github.com/home-anthill) ecosystem) that deploys a MongoDB Sharded Cluster locally. This is a **custom fork** of [pkdone/sharded-mongodb-docker](https://github.com/pkdone/sharded-mongodb-docker) **with reduced replica counts** (2 replicas per set instead of 3).
+Docker Compose project (part of the [home-anthill](https://github.com/home-anthill) ecosystem) that deploys a MongoDB Sharded Cluster locally. This is a **custom fork** of [pkdone/sharded-mongodb-docker](https://github.com/pkdone/sharded-mongodb-docker) **with reduced replica counts** (2 replicas per set instead of 3). The project was renamed from `sharded-mongodb-docker` to `sharded-mongodb-compose` to better reflect its nature as a Compose-based deployment.
 
 The cluster consists of 6 containers:
 - **Shard0**: 2-member replica set (`shard0-replica0`, `shard0-replica1`)

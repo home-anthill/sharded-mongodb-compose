@@ -4,7 +4,7 @@
   <br>
 home-anthill
   <br>
-sharded-mongodb-docker
+sharded-mongodb-compose
 </h1>
 
 
@@ -64,7 +64,7 @@ Use port 27018 to connect to the second `mongos` endpoint.
 
 ## :fire: Releases :fire:
 
-GitHub releases [HERE](https://github.com/home-anthill/sharded-mongodb-docker/releases)
+GitHub releases [HERE](https://github.com/home-anthill/sharded-mongodb-compose/releases)
 
 Versions:
 
