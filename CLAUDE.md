@@ -11,25 +11,49 @@ The cluster consists of 6 containers:
 - **ConfigDB**: 2-member replica set (`configdb-replica0`, `configdb-replica1`)
 - **Mongos routers**: 2 query routers (`mongos-router0` on host port 27017, `mongos-router1` on host port 27018)
 
+## Prerequisites
+
+- Docker Desktop with `docker compose` command
+- MongoDB Shell (`mongosh`) installed on your workstation, or MongoDB Compass for GUI access
+
+## File Structure
+
+```
+sharded-mongodb-compose/
+├── docker-compose.yml       # Defines all 6 containers and their configuration
+├── mongod/
+│   ├── Dockerfile          # Custom mongod image entrypoint
+│   ├── mongod-start.sh     # Entrypoint that forks runextra.sh then execs official entrypoint
+│   ├── mongod-runextra.sh  # Background init script (runs rs.initiate() if DO_INIT_REPSET=true)
+│   └── mongod.conf         # Shared MongoDB server config (mounted as volume in all mongod containers)
+└── mongos/
+    ├── Dockerfile          # Custom mongos image entrypoint
+    ├── mongos-start.sh     # Entrypoint that forks runextra.sh then execs official entrypoint
+    └── mongos-runextra.sh  # Background init script (runs sh.addShard() on router0 only)
+```
+
 ## Commands
 
-Podman is the suggested container runtime, but Docker works as well.
+Docker is the suggested container runtime.
 
 ```bash
 # Build and start the cluster
-podman-compose up --build -d    # or: docker compose up --build -d
+docker compose up --build -d
 
 # Stop and remove all containers
-podman-compose down              # or: docker compose down
+docker compose down
 
 # Check running containers
-podman-compose ps                # or: docker compose ps
+docker compose ps
 
 # View logs for a specific container
-podman-compose logs mongos-router0  # or: docker compose logs mongos-router0
+docker compose logs mongos-router0
 
 # Connect to the cluster via mongosh
 mongosh --port 27017
+
+# Verify cluster status (from mongosh shell)
+sh.status()
 ```
 
 ## Architecture
@@ -45,9 +69,17 @@ Each container uses a two-phase entrypoint pattern. All scripts are POSIX `/bin/
 
 ### Key Environment Variables (set in docker-compose.yml)
 
-- `REPSET_NAME`: Replica set name used by `mongod-runextra.sh` for `rs.initiate()`
-- `DO_INIT_REPSET`: When `true`, triggers replica set initialization on that container
-- `SHARD_LIST`: Semicolon-delimited shard connection strings consumed by `mongos-runextra.sh`
+- `REPSET_NAME`: Replica set name used by `mongod-runextra.sh` for `rs.initiate()` (e.g., `shard0`, `configdb`)
+- `DO_INIT_REPSET`: When `true`, triggers replica set initialization on that container (only set on `replica0` of each set)
+- `SHARD_LIST`: Semicolon-delimited shard connection strings consumed by `mongos-runextra.sh` (only set on `mongos-router0`)
+
+### Replica Set Details
+
+The cluster uses **2-member replica sets** (instead of the upstream project's 3-member sets) to support MongoDB transactions while minimizing resource usage. This is suitable for local development:
+
+- **Shard0** replica set holds the sharded data
+- **ConfigDB** replica set holds the cluster configuration (required for sharding)
+- Each replica set needs at least 2 members to form a quorum and support multi-document transactions
 
 ### Networking
 
@@ -56,3 +88,24 @@ All containers share the `internalnetwork` Docker network. Container hostnames m
 ### Security
 
 This cluster is intended for **local development only** and has no authentication or TLS enabled. The mongos router ports are bound to `127.0.0.1` to prevent exposure to the local network.
+
+## Troubleshooting
+
+**Containers fail to start or exit immediately:**
+- Check Docker daemon is running: `docker ps`
+- Review logs for the failed container: `docker compose logs <container_name>`
+- Ensure port 27017/27018 are not already in use on your host
+
+**Cannot connect with mongosh:**
+- Verify containers are running: `docker compose ps`
+- Check that mongosh is installed: `mongosh --version`
+- Try connecting to the second router if the first fails: `mongosh --port 27018`
+
+**Replica set initialization fails:**
+- The init scripts run in the background; initialization may take 10-30 seconds
+- Check the mongod/mongos logs for "rs.initiate()" or "sh.addShard()" output
+- Verify all containers are healthy: `docker compose ps` should show all as "Up"
+
+**Port already in use:**
+- If 27017/27018 are occupied, modify the port mappings in `docker-compose.yml`
+- Or stop conflicting services: `docker compose down && lsof -i :27017`

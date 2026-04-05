@@ -25,19 +25,12 @@ All containers are visible to each other on the same internal network. Once runn
 
 ### Prerequisites
 
-* [Podman Desktop](https://podman-desktop.io/) and [podman-compose](https://github.com/containers/podman-compose) are installed on your workstation (suggested)
-* Alternatively, [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) can be used
+* [Docker Desktop](https://www.docker.com/) `docker compose` are installed on your workstation (suggested)
 * The [MongoDB Shell](https://docs.mongodb.com/mongodb-shell/install/) is already installed on your workstation (alternatively use [MongoDB Compass](https://docs.mongodb.com/compass/current/install/))
 
 ### Build, Run & Connect
 
 1. Build and start all containers:
-
-```bash
-podman-compose up --build -d
-```
-
-Or with Docker Compose:
 
 ```bash
 docker compose up --build -d
@@ -57,9 +50,9 @@ Use port 27018 to connect to the second `mongos` endpoint.
 
 ### Tips
 
-* Show running containers: `podman-compose ps` (or `docker compose ps`)
-* Show logs: `podman-compose logs mongos-router0` (or `docker compose logs mongos-router0`)
-* Stop and remove all containers: `podman-compose down` (or `docker compose down`)
+* Show running containers: `docker compose ps`
+* Show logs: `docker compose logs mongos-router0`
+* Stop and remove all containers: `docker compose down`
 
 
 ## :fire: Releases :fire:
@@ -68,6 +61,7 @@ GitHub releases [HERE](https://github.com/home-anthill/sharded-mongodb-compose/r
 
 Versions:
 
+- ??/03/2026 - 1.0.1
 - 29/03/2026 - 1.0.0
 
 
