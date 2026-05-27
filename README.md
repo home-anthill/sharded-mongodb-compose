@@ -61,7 +61,7 @@ GitHub releases [HERE](https://github.com/home-anthill/sharded-mongodb-compose/r
 
 Versions:
 
-- ??/03/2026 - 1.0.1
+- 28/05/2026 - 1.0.1
 - 29/03/2026 - 1.0.0
 
 
